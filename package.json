@@ -1,0 +1,19 @@
+{
+  "name": "ana-log",
+  "version": "1.0.0",
+  "description": "Delightful logging for JavaScript",
+  "main": "index.js",
+  "scripts": {
+    "test": "jasmine"
+  },
+  "keywords": [
+    "logging"
+  ],
+  "author": "JM Gustafson",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jasmine": "^3.4.2",
+    "@types/node": "^12.7.11",
+    "jasmine": "^3.5.0"
+  }
+}
