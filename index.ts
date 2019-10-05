@@ -29,7 +29,7 @@ export interface ILoggerConfig
 {
     name: string;
     level: LogLevel;
-    appenders: string[];
+    appenders?: string[];
 }
 
 export interface IAnaLogConfiguration
@@ -149,6 +149,10 @@ export class Logger
     get level(): LogLevel { 
         return this._level;
     }
+    get appenders(): IAppender[] {
+        // return a copy
+        return this._appenders;//.slice();
+    }
     get isDebugEnabled(): boolean {
         return (this.level <= LogLevel.Debug);
     }
@@ -204,8 +208,8 @@ const globalAppenders = new Map<string, IAppender>();
 let defaultLogger: Logger;
 let defaultAppender = new ConsoleAppender();
 
-function addLogger(name: string, level: LogLevel): Logger {
-    const logger = new Logger(name, level);
+function addLogger(name: string, level: LogLevel, ...appender: IAppender[]): Logger {
+    const logger = new Logger(name, level, ...appender);
     globalLoggers.set(name, logger);
     if (name === "") {
         defaultLogger = logger;
@@ -239,18 +243,19 @@ export function getLogger(param1?: string|LogLevel, level?: LogLevel): Logger {
     let logger = globalLoggers.get(name);
     if (!logger) {
         // If it doesn't exist add it
+        if (!defaultLogger) {
+            // Add the default logger if not exists
+            addLogger("", LogLevel.All);
+        }
+        
         if (!param1IsName && typeof param1 === "number") {
             level = param1 as LogLevel;
         }
         else if (!Number.isFinite(level)) {
             // If level not defined set to default level
-            if (!defaultLogger) {
-                // Add the default logger
-                defaultLogger = addLogger("", LogLevel.All);
-            }
             level = defaultLogger.level;
         }
-        logger = addLogger(name, level);
+        logger = addLogger(name, level, ...defaultLogger.appenders);
     }
     return logger;
 }
@@ -264,13 +269,17 @@ export function configure(config: IAnaLogConfiguration): void {
     });
 
     config.loggers.forEach(logCfg => {
-        const logger = addLogger(logCfg.name, logCfg.level);
-        logCfg.appenders.forEach(appName => {
-            logger.addAppender(globalAppenders.get(appName));
-        });
-        if (logCfg.name === "") {
-            defaultLogger = logger;
-        }    
+        let appenders: IAppender[];
+        if (logCfg.appenders && logCfg.appenders.length) {
+            appenders = logCfg.appenders.map(appName => globalAppenders.get(appName));
+        }
+        else if (defaultLogger) {
+            appenders = defaultLogger.appenders;
+        }
+        else {
+            appenders = [defaultAppender];
+        }
+        addLogger(logCfg.name, logCfg.level, ...appenders);
     });
 }
 
@@ -278,7 +287,6 @@ export function configure(config: IAnaLogConfiguration): void {
  * Gets a global appender by name
  */
 export function getAppender(name: string): IAppender {
-    console.log(globalAppenders);
     return globalAppenders.get(name);
 }
 

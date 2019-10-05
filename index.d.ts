@@ -20,7 +20,7 @@ export interface IAppenderConfig {
 export interface ILoggerConfig {
     name: string;
     level: LogLevel;
-    appenders: string[];
+    appenders?: string[];
 }
 export interface IAnaLogConfiguration {
     appenders: IAppenderConfig[];
@@ -74,6 +74,7 @@ export declare class Logger {
     addAppender(...appender: IAppender[]): void;
     readonly name: string;
     readonly level: LogLevel;
+    readonly appenders: IAppender[];
     readonly isDebugEnabled: boolean;
     readonly isInfoEnabled: boolean;
     readonly isWarnEnabled: boolean;

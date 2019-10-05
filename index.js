@@ -101,6 +101,10 @@ class Logger {
     get level() {
         return this._level;
     }
+    get appenders() {
+        // return a copy
+        return this._appenders; //.slice();
+    }
     get isDebugEnabled() {
         return (this.level <= LogLevel.Debug);
     }
@@ -148,8 +152,8 @@ const globalLoggers = new Map();
 const globalAppenders = new Map();
 let defaultLogger;
 let defaultAppender = new ConsoleAppender();
-function addLogger(name, level) {
-    const logger = new Logger(name, level);
+function addLogger(name, level, ...appender) {
+    const logger = new Logger(name, level, ...appender);
     globalLoggers.set(name, logger);
     if (name === "") {
         defaultLogger = logger;
@@ -162,18 +166,18 @@ function getLogger(param1, level) {
     let logger = globalLoggers.get(name);
     if (!logger) {
         // If it doesn't exist add it
+        if (!defaultLogger) {
+            // Add the default logger if not exists
+            addLogger("", LogLevel.All);
+        }
         if (!param1IsName && typeof param1 === "number") {
             level = param1;
         }
         else if (!Number.isFinite(level)) {
             // If level not defined set to default level
-            if (!defaultLogger) {
-                // Add the default logger
-                defaultLogger = addLogger("", LogLevel.All);
-            }
             level = defaultLogger.level;
         }
-        logger = addLogger(name, level);
+        logger = addLogger(name, level, ...defaultLogger.appenders);
     }
     return logger;
 }
@@ -186,13 +190,17 @@ function configure(config) {
         addAppender(appenderCfg.name, appenderCfg.appender);
     });
     config.loggers.forEach(logCfg => {
-        const logger = addLogger(logCfg.name, logCfg.level);
-        logCfg.appenders.forEach(appName => {
-            logger.addAppender(globalAppenders.get(appName));
-        });
-        if (logCfg.name === "") {
-            defaultLogger = logger;
+        let appenders;
+        if (logCfg.appenders && logCfg.appenders.length) {
+            appenders = logCfg.appenders.map(appName => globalAppenders.get(appName));
         }
+        else if (defaultLogger) {
+            appenders = defaultLogger.appenders;
+        }
+        else {
+            appenders = [defaultAppender];
+        }
+        addLogger(logCfg.name, logCfg.level, ...appenders);
     });
 }
 exports.configure = configure;
@@ -200,7 +208,6 @@ exports.configure = configure;
  * Gets a global appender by name
  */
 function getAppender(name) {
-    console.log(globalAppenders);
     return globalAppenders.get(name);
 }
 exports.getAppender = getAppender;
