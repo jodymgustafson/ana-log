@@ -21,9 +21,7 @@ class DefaultFormatter {
     }
     getMessage(...data) {
         return data.reduce((prev, cur) => {
-            return prev + " " + ((typeof cur === "function") ? cur() :
-                (typeof cur === "string") ? cur :
-                    JSON.stringify(cur));
+            return prev + " " + ((typeof cur === "string") ? cur : JSON.stringify(cur));
         }, "");
     }
 }
@@ -144,7 +142,10 @@ class Logger {
         }
     }
     writeToAppenders(level, ...data) {
-        this._appenders.forEach(a => a.write(this, level, ...data));
+        this._appenders.forEach(a => a.write(this, level, ...this.processData(...data)));
+    }
+    processData(...data) {
+        return data.map(value => (typeof value === "function") ? value() : value);
     }
 }
 exports.Logger = Logger;

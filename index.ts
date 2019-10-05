@@ -53,9 +53,7 @@ export class DefaultFormatter implements IFormatter
     {
         return data.reduce((prev: string, cur: any) => {
             return prev + " " + (
-                (typeof cur === "function") ? cur() :
-                (typeof cur === "string") ? cur :
-                JSON.stringify(cur));
+                (typeof cur === "string") ? cur : JSON.stringify(cur));
         }, "");
     }
 }
@@ -199,7 +197,11 @@ export class Logger
     }
 
     protected writeToAppenders(level: LogLevel, ...data: any[]): void {
-        this._appenders.forEach(a => a.write(this, level, ...data));
+        this._appenders.forEach(a => a.write(this, level, ...this.processData(...data)));
+    }
+    
+    private processData(...data: any[]): any[] {
+        return data.map(value => (typeof value === "function") ? value() : value);
     }
 }
 

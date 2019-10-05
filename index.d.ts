@@ -88,6 +88,7 @@ export declare class Logger {
     fatal(...data: any[]): void;
     log(level: LogLevel, ...data: any[]): void;
     protected writeToAppenders(level: LogLevel, ...data: any[]): void;
+    private processData;
 }
 /**
  * Gets the default logger

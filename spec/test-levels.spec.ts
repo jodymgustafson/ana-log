@@ -136,11 +136,11 @@ describe("Test Levels:", () =>{
 function logAllLevels(logger: anaLog.Logger): void {
     (logger.appenders[0] as anaLog.MemoryAppender).reset();
     const level = anaLog.LogLevel[logger.level].toLocaleLowerCase();
-    logger.debug(level + " debug");
-    logger.info(level + " info");
-    logger.warn(level + " warn");
-    logger.error(level + " error");
-    logger.fatal(level + " fatal");
+    logger.debug(() => level + " debug");
+    logger.info(() => level + " info");
+    logger.warn(() => level + " warn");
+    logger.error(() => level + " error");
+    logger.fatal(() => level + " fatal");
 }
 
 function checkAllLevels(logger: anaLog.Logger, debug: boolean, info: boolean, warn: boolean, error: boolean, fatal: boolean): void {
