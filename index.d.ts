@@ -20,7 +20,7 @@ export interface IAppenderConfig {
 export interface ILoggerConfig {
     name: string;
     level: LogLevel;
-    appenders?: string[];
+    appenders?: (string | IAppender)[];
 }
 export interface IAnaLogConfiguration {
     appenders: IAppenderConfig[];

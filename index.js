@@ -193,7 +193,7 @@ function configure(config) {
     config.loggers.forEach(logCfg => {
         let appenders;
         if (logCfg.appenders && logCfg.appenders.length) {
-            appenders = logCfg.appenders.map(appName => globalAppenders.get(appName));
+            appenders = logCfg.appenders.map(appdr => typeof appdr === "string" ? globalAppenders.get(appdr) : appdr);
         }
         else if (defaultLogger) {
             appenders = defaultLogger.appenders;

@@ -29,7 +29,7 @@ export interface ILoggerConfig
 {
     name: string;
     level: LogLevel;
-    appenders?: string[];
+    appenders?: (string|IAppender)[];
 }
 
 export interface IAnaLogConfiguration
@@ -273,7 +273,7 @@ export function configure(config: IAnaLogConfiguration): void {
     config.loggers.forEach(logCfg => {
         let appenders: IAppender[];
         if (logCfg.appenders && logCfg.appenders.length) {
-            appenders = logCfg.appenders.map(appName => globalAppenders.get(appName));
+            appenders = logCfg.appenders.map(appdr => typeof appdr === "string" ? globalAppenders.get(appdr) : appdr);
         }
         else if (defaultLogger) {
             appenders = defaultLogger.appenders;
