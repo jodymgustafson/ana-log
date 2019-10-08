@@ -17,7 +17,7 @@ Requires ES6
 
 ## Quick Start
 Install using npm
-- npm install --save ana-log
+- npm install --save @worldtreesoftware/ana-log
 
 For simple logging you can get started without doing any configuration.
 Simply call the getLogger() function to get a root logger and set its level.
