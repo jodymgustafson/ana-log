@@ -1,5 +1,5 @@
 {
-  "name": "ana-log",
+  "name": "@worldtreesoftware/ana-log",
   "version": "1.0.0",
   "description": "Delightful logging for JavaScript",
   "main": "index.js",
@@ -11,6 +11,10 @@
   ],
   "author": "JM Gustafson",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jodymgustafson/ana-log"
+  },
   "devDependencies": {
     "@types/jasmine": "^3.4.2",
     "@types/node": "^12.7.11",
