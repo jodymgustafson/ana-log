@@ -115,14 +115,16 @@ To add one or more appenders to a logger use its `addAppender()` method.
 
     logger.addAppender(new ConsoleAppender(), new MemoryAppender());
 
+You can also set the logging level on an appender by passing it into the constructor.
+For example, you might want to write all messages to one appender, but only errors to another appender.
+
+    logger.addAppender(new ConsoleAppender(), new MemoryAppender(LogLevel.Error);
+
 You can create your own appender to write messages to anywhere.
 For example, you may want to write to a file or a REST API or a database.
 The easiest way to do this is to extend the BaseAppender class and implement the `writeMessage(message: string)` method:
 
     class MyAppender extends anaLog.BaseAppender {
-        constructor(formatter) {
-            super(formatter);
-        }
         writeMessage(message) {
             // write the message to somewhere
         }

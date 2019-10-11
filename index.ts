@@ -58,15 +58,44 @@ export class DefaultFormatter implements IFormatter
     }
 }
 
+const DEFAULT_FORMATTER = new DefaultFormatter();
+
 /**
  * Abstract base class for implementing IAppender
  */
 export abstract class BaseAppender implements IAppender
 {
-    constructor(protected formatter: IFormatter = new DefaultFormatter()){}
+    private _formatter: IFormatter;
+    public get formatter() {
+        return this._formatter;
+    }
+
+    private _level = LogLevel.All;
+    public get level() {
+        return this._level;
+    }
+
+    constructor();
+    constructor(formatter: IFormatter);
+    constructor(logLevel: LogLevel);
+    constructor(logLevel: LogLevel, formatter: IFormatter);
+    constructor(param1?: IFormatter|LogLevel, formatter?: IFormatter) {
+        if (typeof param1 === "undefined") {
+            this._formatter = DEFAULT_FORMATTER;
+        }
+        else if (typeof param1 === "number") {
+            this._level = param1;
+            this._formatter = formatter || DEFAULT_FORMATTER;
+        }
+        else {
+            this._formatter = param1 || DEFAULT_FORMATTER;
+        }
+    }
 
     write(logger: Logger, level: LogLevel, ...data: any[]): void {
-        this.writeMessage(this.formatter.format(logger, level, ...data))
+        if (this.level <= level) {
+            this.writeMessage(this.formatter.format(logger, level, ...data))
+        }
     }
 
     protected abstract writeMessage(message: string): void;
@@ -75,17 +104,10 @@ export abstract class BaseAppender implements IAppender
 /**
  * An appender that writes log messages to the console
  */
-export class ConsoleAppender implements IAppender
+export class ConsoleAppender extends BaseAppender
 {
-    constructor(protected formatter: IFormatter = new DefaultFormatter()){}
-
-    write(logger: Logger, level: LogLevel, ...data: any[]): void {
-        // Don't pass ...data to formatter, let the console output it using it's own format
-        const formatted = this.formatter.format(logger, level);
-        if (logger.level >= LogLevel.Error && console.error)
-            console.error(formatted, ...data);
-        else
-            console.log(formatted, ...data);
+    protected writeMessage(message: string): void {
+        console.log(message);
     }
 }
 
@@ -96,10 +118,6 @@ export class MemoryAppender extends BaseAppender
 {
     private _buffer: string[] = [];
     get buffer(): string[] {return this._buffer;}
-
-    constructor(formatter?: IFormatter){
-        super(formatter);
-    }
 
     /** Clears the buffer */
     reset(): void {

@@ -26,32 +26,43 @@ class DefaultFormatter {
     }
 }
 exports.DefaultFormatter = DefaultFormatter;
+const DEFAULT_FORMATTER = new DefaultFormatter();
 /**
  * Abstract base class for implementing IAppender
  */
 class BaseAppender {
-    constructor(formatter = new DefaultFormatter()) {
-        this.formatter = formatter;
+    constructor(param1, formatter) {
+        this._level = LogLevel.All;
+        if (typeof param1 === "undefined") {
+            this._formatter = DEFAULT_FORMATTER;
+        }
+        else if (typeof param1 === "number") {
+            this._level = param1;
+            this._formatter = formatter || DEFAULT_FORMATTER;
+        }
+        else {
+            this._formatter = param1 || DEFAULT_FORMATTER;
+        }
+    }
+    get formatter() {
+        return this._formatter;
+    }
+    get level() {
+        return this._level;
     }
     write(logger, level, ...data) {
-        this.writeMessage(this.formatter.format(logger, level, ...data));
+        if (this.level <= level) {
+            this.writeMessage(this.formatter.format(logger, level, ...data));
+        }
     }
 }
 exports.BaseAppender = BaseAppender;
 /**
  * An appender that writes log messages to the console
  */
-class ConsoleAppender {
-    constructor(formatter = new DefaultFormatter()) {
-        this.formatter = formatter;
-    }
-    write(logger, level, ...data) {
-        // Don't pass ...data to formatter, let the console output it using it's own format
-        const formatted = this.formatter.format(logger, level);
-        if (logger.level >= LogLevel.Error && console.error)
-            console.error(formatted, ...data);
-        else
-            console.log(formatted, ...data);
+class ConsoleAppender extends BaseAppender {
+    writeMessage(message) {
+        console.log(message);
     }
 }
 exports.ConsoleAppender = ConsoleAppender;
@@ -59,8 +70,8 @@ exports.ConsoleAppender = ConsoleAppender;
  * An appender that writes log messages to an array
  */
 class MemoryAppender extends BaseAppender {
-    constructor(formatter) {
-        super(formatter);
+    constructor() {
+        super(...arguments);
         this._buffer = [];
     }
     get buffer() { return this._buffer; }

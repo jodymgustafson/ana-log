@@ -1,18 +1,19 @@
 import * as anaLog from "../index";
 
-let memoryAppdr = new anaLog.MemoryAppender();
+const allAppdr = new anaLog.MemoryAppender();
+const errorAppdr = new anaLog.MemoryAppender(anaLog.LogLevel.Error);
 
 anaLog.reset();
 anaLog.configure({
-    appenders: [{
-        name: "memory",
-        appender: memoryAppdr
-    }],
+    appenders: [
+        { name: "all", appender: allAppdr },
+        { name: "error", appender: errorAppdr }
+    ],
     loggers: [
         {
             name: "",
             level: anaLog.LogLevel.All,
-            appenders: [ "memory" ]
+            appenders: [ "all", "error" ]
         },
         {
             name: "debug",
@@ -57,8 +58,9 @@ describe("Test Levels:", () =>{
         const fatal = anaLog.getLogger("fatal");
         it("should get fatal logger", () => expect(fatal.level).toBe(anaLog.LogLevel.Fatal));
         it("should get the appender", () => {
-            const appender = root.appenders[0];
-            expect(appender).toBe(memoryAppdr)
+            expect(root.appenders.length).toBe(2);
+            expect(root.appenders[0]).toBe(allAppdr)
+            expect(root.appenders[1]).toBe(errorAppdr)
         });
     });
 
@@ -67,74 +69,82 @@ describe("Test Levels:", () =>{
         const logger = anaLog.getLogger();
         beforeAll(() => logAllLevels(logger));
         checkAllLevels(logger, true, true, true, true, true);
-        it("should have 5 entries", () => expect(memoryAppdr.buffer.length).toBe(5));
-        it("should log debug", () =>  expect(memoryAppdr.buffer[0].endsWith("Z] [Debug] all debug")).toBeTruthy());
-        it("should log info", () => expect(memoryAppdr.buffer[1].endsWith("Z] [Info] all info")).toBeTruthy());
-        it("should log warn", () => expect(memoryAppdr.buffer[2].endsWith("Z] [Warn] all warn")).toBeTruthy());
-        it("should log error", () => expect(memoryAppdr.buffer[3].endsWith("Z] [Error] all error")).toBeTruthy());
-        it("should log fatal", () => expect(memoryAppdr.buffer[4].endsWith("Z] [Fatal] all fatal")).toBeTruthy());
+        it("should have 5 entries", () => expect(allAppdr.buffer.length).toBe(5));
+        it("should log debug", () =>  expect(allAppdr.buffer[0].endsWith("Z] [Debug] all debug")).toBeTruthy());
+        it("should log info", () => expect(allAppdr.buffer[1].endsWith("Z] [Info] all info")).toBeTruthy());
+        it("should log warn", () => expect(allAppdr.buffer[2].endsWith("Z] [Warn] all warn")).toBeTruthy());
+        it("should log error", () => expect(allAppdr.buffer[3].endsWith("Z] [Error] all error")).toBeTruthy());
+        it("should log fatal", () => expect(allAppdr.buffer[4].endsWith("Z] [Fatal] all fatal")).toBeTruthy());
+
+        it("error appender should have 2 entries", () => expect(errorAppdr.buffer.length).toBe(2));
+        it("should log error to error appender", () => expect(errorAppdr.buffer[0].endsWith("Z] [Error] all error")).toBeTruthy());
+        it("should log fatal to error appender", () => expect(errorAppdr.buffer[1].endsWith("Z] [Fatal] all fatal")).toBeTruthy());
     });
 
     describe("When log level set to DEBUG", () => {
         let logger = anaLog.getLogger("debug");
         beforeAll(() => logAllLevels(logger));
         checkAllLevels(logger, true, true, true, true, true);
-        it("should have 5 entries", () => expect(memoryAppdr.buffer.length).toBe(5));
-        it("should log debug", () =>  expect(memoryAppdr.buffer[0].endsWith("Z] [Debug] [debug] debug debug")).toBeTruthy());
-        it("should log info", () => expect(memoryAppdr.buffer[1].endsWith("Z] [Info] [debug] debug info")).toBeTruthy());
-        it("should log warn", () => expect(memoryAppdr.buffer[2].endsWith("Z] [Warn] [debug] debug warn")).toBeTruthy());
-        it("should log error", () => expect(memoryAppdr.buffer[3].endsWith("Z] [Error] [debug] debug error")).toBeTruthy());
-        it("should log fatal", () => expect(memoryAppdr.buffer[4].endsWith("Z] [Fatal] [debug] debug fatal")).toBeTruthy());
+        it("should have 5 entries", () => expect(allAppdr.buffer.length).toBe(5));
+        it("should log debug", () =>  expect(allAppdr.buffer[0].endsWith("Z] [Debug] [debug] debug debug")).toBeTruthy());
+        it("should log info", () => expect(allAppdr.buffer[1].endsWith("Z] [Info] [debug] debug info")).toBeTruthy());
+        it("should log warn", () => expect(allAppdr.buffer[2].endsWith("Z] [Warn] [debug] debug warn")).toBeTruthy());
+        it("should log error", () => expect(allAppdr.buffer[3].endsWith("Z] [Error] [debug] debug error")).toBeTruthy());
+        it("should log fatal", () => expect(allAppdr.buffer[4].endsWith("Z] [Fatal] [debug] debug fatal")).toBeTruthy());
     });
 
     describe("When log level set to INFO", () => {
         const logger = anaLog.getLogger("info");
         beforeAll(() => logAllLevels(logger));
         checkAllLevels(logger, false, true, true, true, true);
-        it("should have 4 entries", () => expect(memoryAppdr.buffer.length).toBe(4));
-        it("should log info", () => expect(memoryAppdr.buffer[0].endsWith("Z] [Info] [info] info info")).toBeTruthy());
-        it("should log warn", () => expect(memoryAppdr.buffer[1].endsWith("Z] [Warn] [info] info warn")).toBeTruthy());
-        it("should log error", () => expect(memoryAppdr.buffer[2].endsWith("Z] [Error] [info] info error")).toBeTruthy());
-        it("should log fatal", () => expect(memoryAppdr.buffer[3].endsWith("Z] [Fatal] [info] info fatal")).toBeTruthy());
+        it("should have 4 entries", () => expect(allAppdr.buffer.length).toBe(4));
+        it("should log info", () => expect(allAppdr.buffer[0].endsWith("Z] [Info] [info] info info")).toBeTruthy());
+        it("should log warn", () => expect(allAppdr.buffer[1].endsWith("Z] [Warn] [info] info warn")).toBeTruthy());
+        it("should log error", () => expect(allAppdr.buffer[2].endsWith("Z] [Error] [info] info error")).toBeTruthy());
+        it("should log fatal", () => expect(allAppdr.buffer[3].endsWith("Z] [Fatal] [info] info fatal")).toBeTruthy());
     });
 
     describe("When log level set to WARN", () => {
         const logger = anaLog.getLogger("warn");
         beforeAll(() => logAllLevels(logger));
         checkAllLevels(logger, false, false, true, true, true);
-        it("should have 3 entries", () => expect(memoryAppdr.buffer.length).toBe(3));
-        it("should log warn", () => expect(memoryAppdr.buffer[0].endsWith("Z] [Warn] [warn] warn warn")).toBeTruthy());
-        it("should log error", () => expect(memoryAppdr.buffer[1].endsWith("Z] [Error] [warn] warn error")).toBeTruthy());
-        it("should log fatal", () => expect(memoryAppdr.buffer[2].endsWith("Z] [Fatal] [warn] warn fatal")).toBeTruthy());
+        it("should have 3 entries", () => expect(allAppdr.buffer.length).toBe(3));
+        it("should log warn", () => expect(allAppdr.buffer[0].endsWith("Z] [Warn] [warn] warn warn")).toBeTruthy());
+        it("should log error", () => expect(allAppdr.buffer[1].endsWith("Z] [Error] [warn] warn error")).toBeTruthy());
+        it("should log fatal", () => expect(allAppdr.buffer[2].endsWith("Z] [Fatal] [warn] warn fatal")).toBeTruthy());
     });
 
     describe("When log level set to ERROR", () => {
         const logger = anaLog.getLogger("error");
         beforeAll(() => logAllLevels(logger));
         checkAllLevels(logger, false, false, false, true, true);
-        it("should have 2 entries", () => expect(memoryAppdr.buffer.length).toBe(2));
-        it("should log error", () => expect(memoryAppdr.buffer[0].endsWith("Z] [Error] [error] error error")).toBeTruthy());
-        it("should log fatal", () => expect(memoryAppdr.buffer[1].endsWith("Z] [Fatal] [error] error fatal")).toBeTruthy());
+        it("should have 2 entries", () => expect(allAppdr.buffer.length).toBe(2));
+        it("should log error", () => expect(allAppdr.buffer[0].endsWith("Z] [Error] [error] error error")).toBeTruthy());
+        it("should log fatal", () => expect(allAppdr.buffer[1].endsWith("Z] [Fatal] [error] error fatal")).toBeTruthy());
     });
 
     describe("When log level set to FATAL", () => {
         const logger = anaLog.getLogger("fatal");
         beforeAll(() => logAllLevels(logger));
         checkAllLevels(logger, false, false, false, false, true);
-        it("should have 1 entries", () => expect(memoryAppdr.buffer.length).toBe(1));
-        it("should log fatal", () => expect(memoryAppdr.buffer[0].endsWith("Z] [Fatal] [fatal] fatal fatal")).toBeTruthy());
+        it("should have 1 entries", () => expect(allAppdr.buffer.length).toBe(1));
+        it("should log fatal", () => expect(allAppdr.buffer[0].endsWith("Z] [Fatal] [fatal] fatal fatal")).toBeTruthy());
+
+        it("error appender should have 1 entry", () => expect(errorAppdr.buffer.length).toBe(1));
+        it("should log fatal to error appender", () => expect(errorAppdr.buffer[0].endsWith("Z] [Fatal] [fatal] fatal fatal")).toBeTruthy());
     });
 
     describe("When log level set to NONE", () => {
         const logger = anaLog.getLogger("none");
         beforeAll(() => logAllLevels(logger));
         checkAllLevels(logger, false, false, false, false, false);
-        it("should have 0 entries", () => expect(memoryAppdr.buffer.length).toBe(0));
+        it("all appender should have 0 entries", () => expect(allAppdr.buffer.length).toBe(0));
+        it("error appender should have 0 entry", () => expect(errorAppdr.buffer.length).toBe(0));
     });
 });
 
 function logAllLevels(logger: anaLog.Logger): void {
-    (logger.appenders[0] as anaLog.MemoryAppender).reset();
+    logger.appenders.forEach(appdr => (appdr as anaLog.MemoryAppender).reset());
     const level = anaLog.LogLevel[logger.level].toLocaleLowerCase();
     logger.debug(() => level + " debug");
     logger.info(() => level + " info");

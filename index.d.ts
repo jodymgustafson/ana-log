@@ -37,18 +37,22 @@ export declare class DefaultFormatter implements IFormatter {
  * Abstract base class for implementing IAppender
  */
 export declare abstract class BaseAppender implements IAppender {
-    protected formatter: IFormatter;
-    constructor(formatter?: IFormatter);
+    private _formatter;
+    readonly formatter: IFormatter;
+    private _level;
+    readonly level: LogLevel;
+    constructor();
+    constructor(formatter: IFormatter);
+    constructor(logLevel: LogLevel);
+    constructor(logLevel: LogLevel, formatter: IFormatter);
     write(logger: Logger, level: LogLevel, ...data: any[]): void;
     protected abstract writeMessage(message: string): void;
 }
 /**
  * An appender that writes log messages to the console
  */
-export declare class ConsoleAppender implements IAppender {
-    protected formatter: IFormatter;
-    constructor(formatter?: IFormatter);
-    write(logger: Logger, level: LogLevel, ...data: any[]): void;
+export declare class ConsoleAppender extends BaseAppender {
+    protected writeMessage(message: string): void;
 }
 /**
  * An appender that writes log messages to an array
@@ -56,7 +60,6 @@ export declare class ConsoleAppender implements IAppender {
 export declare class MemoryAppender extends BaseAppender {
     private _buffer;
     readonly buffer: string[];
-    constructor(formatter?: IFormatter);
     /** Clears the buffer */
     reset(): void;
     protected writeMessage(message: string): void;
