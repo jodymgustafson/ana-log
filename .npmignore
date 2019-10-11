@@ -3,4 +3,4 @@ test
 .vscode
 tsconfig.json
 **/*.js.map
-**/*.ts
+index.ts

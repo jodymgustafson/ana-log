@@ -11,7 +11,7 @@ It's designed to be easy to use with minimal configuration, yet allow more compl
 - Pass in multiple messages like console.log()
 - Batteries included -- everything you need to get started is in this package
 - No external dependencies
-- TypeScript type definition file built in
+- TypeScript type definitions built in
 
 ## Why?
 Why create my own logging library when there are so many others available?
