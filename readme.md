@@ -115,8 +115,8 @@ To add one or more appenders to a logger use its `addAppender()` method.
 
     logger.addAppender(new ConsoleAppender(), new MemoryAppender());
 
-You can write your own appender to write messages to anywhere.
-For example, you may want to write to a file or a REST api or a database.
+You can create your own appender to write messages to anywhere.
+For example, you may want to write to a file or a REST API or a database.
 The easiest way to do this is to extend the BaseAppender class and implement the `writeMessage(message: string)` method:
 
     class MyAppender extends anaLog.BaseAppender {
@@ -141,7 +141,7 @@ You can write your own formatter by creating a class with the following method.
 
 ## Configuration
 You don't need to configure AnaLog to get started but you will probably want to for more complex applications.
-To do this call the configure() function passing in a list of appenders and a list of loggers.
+To do this call the `configure()` function passing in a list of appenders and a list of loggers.
 
     anaLog.configure({
         appenders: [
@@ -168,9 +168,9 @@ To do this call the configure() function passing in a list of appenders and a li
         ]
     });
 
-If the logger name is empty string ("") it will define the default logger.
+If the logger name is empty string ("") it will define the default logger *(see above)*.
 There is also a default appender whose name is empty string.
-The default logger is a special logger that defines the default logging level and formatter for all other loggers.
 
 In the example above it defines two appenders. Then it adds two loggers that use the two appenders. It sets the default logger to Error level and adds the default and memory appenders. It sets the "startup" logger to Info level and adds myAppender.
 
+**Code Hard!**
