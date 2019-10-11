@@ -23,7 +23,7 @@ export interface ILoggerConfig {
     appenders?: (string | IAppender)[];
 }
 export interface IAnaLogConfiguration {
-    appenders: IAppenderConfig[];
+    appenders?: IAppenderConfig[];
     loggers: ILoggerConfig[];
 }
 /**
@@ -45,6 +45,7 @@ export declare abstract class BaseAppender implements IAppender {
     constructor(formatter: IFormatter);
     constructor(logLevel: LogLevel);
     constructor(logLevel: LogLevel, formatter: IFormatter);
+    constructor(logLevel?: LogLevel, formatter?: IFormatter);
     write(logger: Logger, level: LogLevel, ...data: any[]): void;
     protected abstract writeMessage(message: string): void;
 }

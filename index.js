@@ -31,14 +31,14 @@ const DEFAULT_FORMATTER = new DefaultFormatter();
  * Abstract base class for implementing IAppender
  */
 class BaseAppender {
-    constructor(param1, formatter) {
+    constructor(param1, param2) {
         this._level = LogLevel.All;
         if (typeof param1 === "undefined") {
             this._formatter = DEFAULT_FORMATTER;
         }
         else if (typeof param1 === "number") {
             this._level = param1;
-            this._formatter = formatter || DEFAULT_FORMATTER;
+            this._formatter = param2 || DEFAULT_FORMATTER;
         }
         else {
             this._formatter = param1 || DEFAULT_FORMATTER;
@@ -196,9 +196,11 @@ exports.getLogger = getLogger;
  * Configures AnaLog defaults at startup
  */
 function configure(config) {
-    config.appenders.forEach(appenderCfg => {
-        addAppender(appenderCfg.name, appenderCfg.appender);
-    });
+    if (config.appenders) {
+        config.appenders.forEach(appenderCfg => {
+            addAppender(appenderCfg.name, appenderCfg.appender);
+        });
+    }
     config.loggers.forEach(logCfg => {
         let appenders;
         if (logCfg.appenders && logCfg.appenders.length) {

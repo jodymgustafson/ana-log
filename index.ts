@@ -34,7 +34,7 @@ export interface ILoggerConfig
 
 export interface IAnaLogConfiguration
 {
-    appenders: IAppenderConfig[];
+    appenders?: IAppenderConfig[];
     loggers: ILoggerConfig[];
 }
 
@@ -79,13 +79,14 @@ export abstract class BaseAppender implements IAppender
     constructor(formatter: IFormatter);
     constructor(logLevel: LogLevel);
     constructor(logLevel: LogLevel, formatter: IFormatter);
-    constructor(param1?: IFormatter|LogLevel, formatter?: IFormatter) {
+    constructor(logLevel?: LogLevel, formatter?: IFormatter);
+    constructor(param1?: IFormatter|LogLevel, param2?: IFormatter) {
         if (typeof param1 === "undefined") {
             this._formatter = DEFAULT_FORMATTER;
         }
         else if (typeof param1 === "number") {
             this._level = param1;
-            this._formatter = formatter || DEFAULT_FORMATTER;
+            this._formatter = param2 || DEFAULT_FORMATTER;
         }
         else {
             this._formatter = param1 || DEFAULT_FORMATTER;
@@ -279,9 +280,11 @@ export function getLogger(param1?: string|LogLevel, level?: LogLevel): Logger {
  * Configures AnaLog defaults at startup
  */
 export function configure(config: IAnaLogConfiguration): void {
-    config.appenders.forEach(appenderCfg => {
-        addAppender(appenderCfg.name, appenderCfg.appender);
-    });
+    if (config.appenders) {
+        config.appenders.forEach(appenderCfg => {
+            addAppender(appenderCfg.name, appenderCfg.appender);
+        });
+    }
 
     config.loggers.forEach(logCfg => {
         let appenders: IAppender[];
