@@ -7,7 +7,7 @@ It's designed to be easy to use with minimal configuration, yet allow more compl
 - No configuration necessary for simple logging to console
 - Supports standard logging levels from debug to fatal
 - Not necessary to check log level before logging
-- Can define your own appenders to write messages anywhere you want
+- Can easily write your own appenders to write messages anywhere you want
 - Pass in multiple messages like console.log()
 - Batteries included -- everything you need to get started is in this package
 - No external dependencies
@@ -50,12 +50,12 @@ There are three ways to log at any level.
     if (logger.isInfoEnabled)
         logger.info("Hello " + name);
 
-Note: If you are constructing a string as above you should check the logging level first so you don't create strings for no reason.
+*Note: If you are constructing a string as above you should check the logging level first so you don't create strings for no reason.*
 
 #### Passing in an object
     logger.error(myObject);
 
-Note: The object will be formatted to a json string
+*Note: The object will be formatted to a json string*
 
 #### Using a function
     logger.info(() => "Hello " + name);
@@ -83,27 +83,26 @@ Log levels are defined by the enumeration `LogLevel`.
 - `LogLevel.None`: No messages will be logged
 
 ## Loggers
-You call the getLogger() function to get and/or initialize a logger.
+You call the `anaLog.getLogger()` function to get and/or initialize a logger.
 You can use as many different loggers as you like.
 If the logger you're attempting to retrieve doesn't exist it will be created.
+It has a number of overloads.
 
-getLogger() has a number of overloads.
-
-- getLogger()
+- `getLogger()`
     - Gets the default logger
-- getLogger(level: LogLevel)
-    - Gets the default logger with the specified level
-- getLogger(name: string)
+- `getLogger(level: LogLevel)`
+    - Gets the default logger initializing the level
+- `getLogger(name: string)`
     - Gets the logger with the specified name
-- getLogger(name: string, level: LogLevel)
-    - Gets the logger with the specified name and level
+- `getLogger(name: string, level: LogLevel)`
+    - Gets the logger with the specified name and initializes level
 
-Note: Once you initialize a logger with a level you can't change it.
+*Note: Once you initialize a logger with a level you can't change it.*
 
 ### The Default Logger
 The default logger is a special logger that defines the default level and appender.
 Any time you get a new logger without specifying a level it will be set to the default logger's level.
-So you will probably always want to call getLogger(level: LogLevel) at the beginning of your application, unless you are using a configuration (see below).
+So you will probably always want to call `getLogger(level: LogLevel)` at the beginning of your application, unless you are using a configuration *(see below)*.
 
 ## Appenders
 Appenders are added to loggers to tell it where to write messages to.
