@@ -39,15 +39,16 @@ export declare class DefaultFormatter implements IFormatter {
 export declare abstract class BaseAppender implements IAppender {
     protected formatter: IFormatter;
     constructor(formatter?: IFormatter);
-    abstract write(logger: Logger, ...data: any[]): void;
+    write(logger: Logger, level: LogLevel, ...data: any[]): void;
+    protected abstract writeMessage(message: string): void;
 }
 /**
  * An appender that writes log messages to the console
  */
-export declare class ConsoleAppender extends BaseAppender {
+export declare class ConsoleAppender implements IAppender {
+    protected formatter: IFormatter;
     constructor(formatter?: IFormatter);
     write(logger: Logger, level: LogLevel, ...data: any[]): void;
-    private writeToConsole;
 }
 /**
  * An appender that writes log messages to an array
@@ -56,9 +57,9 @@ export declare class MemoryAppender extends BaseAppender {
     private _buffer;
     readonly buffer: string[];
     constructor(formatter?: IFormatter);
-    write(logger: Logger, level: LogLevel, ...data: any[]): void;
+    /** Clears the buffer */
     reset(): void;
-    private writeToBuffer;
+    protected writeMessage(message: string): void;
 }
 export declare class Logger {
     private _name;

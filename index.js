@@ -33,20 +33,20 @@ class BaseAppender {
     constructor(formatter = new DefaultFormatter()) {
         this.formatter = formatter;
     }
+    write(logger, level, ...data) {
+        this.writeMessage(this.formatter.format(logger, level, ...data));
+    }
 }
 exports.BaseAppender = BaseAppender;
 /**
  * An appender that writes log messages to the console
  */
-class ConsoleAppender extends BaseAppender {
-    constructor(formatter) {
-        super(formatter);
+class ConsoleAppender {
+    constructor(formatter = new DefaultFormatter()) {
+        this.formatter = formatter;
     }
     write(logger, level, ...data) {
-        this.writeToConsole(logger, level, ...data);
-    }
-    writeToConsole(logger, level, ...data) {
-        // Don't pass data to formatter, let the console output it
+        // Don't pass ...data to formatter, let the console output it using it's own format
         const formatted = this.formatter.format(logger, level);
         if (logger.level >= LogLevel.Error && console.error)
             console.error(formatted, ...data);
@@ -64,14 +64,12 @@ class MemoryAppender extends BaseAppender {
         this._buffer = [];
     }
     get buffer() { return this._buffer; }
-    write(logger, level, ...data) {
-        this.writeToBuffer(logger, level, ...data);
-    }
+    /** Clears the buffer */
     reset() {
         this._buffer = [];
     }
-    writeToBuffer(logger, level, ...data) {
-        this._buffer.push(this.formatter.format(logger, level, ...data));
+    writeMessage(message) {
+        this._buffer.push(message);
     }
 }
 exports.MemoryAppender = MemoryAppender;

@@ -65,24 +65,22 @@ export abstract class BaseAppender implements IAppender
 {
     constructor(protected formatter: IFormatter = new DefaultFormatter()){}
 
-    abstract write(logger: Logger, ...data: any[]): void;
+    write(logger: Logger, level: LogLevel, ...data: any[]): void {
+        this.writeMessage(this.formatter.format(logger, level, ...data))
+    }
+
+    protected abstract writeMessage(message: string): void;
 }
 
 /**
  * An appender that writes log messages to the console
  */
-export class ConsoleAppender extends BaseAppender
+export class ConsoleAppender implements IAppender
 {
-    constructor(formatter?: IFormatter){
-        super(formatter);
-    }
+    constructor(protected formatter: IFormatter = new DefaultFormatter()){}
 
     write(logger: Logger, level: LogLevel, ...data: any[]): void {
-        this.writeToConsole(logger, level, ...data);
-    }
-
-    private writeToConsole(logger: Logger, level: LogLevel, ...data: any[]): void {
-        // Don't pass data to formatter, let the console output it
+        // Don't pass ...data to formatter, let the console output it using it's own format
         const formatted = this.formatter.format(logger, level);
         if (logger.level >= LogLevel.Error && console.error)
             console.error(formatted, ...data);
@@ -103,16 +101,13 @@ export class MemoryAppender extends BaseAppender
         super(formatter);
     }
 
-    write(logger: Logger, level: LogLevel, ...data: any[]): void {
-        this.writeToBuffer(logger, level, ...data);
-    }
-
+    /** Clears the buffer */
     reset(): void {
         this._buffer = [];
     }
 
-    private writeToBuffer(logger: Logger, level: LogLevel, ...data: any[]) {
-        this._buffer.push(this.formatter.format(logger, level, ...data));
+    protected writeMessage(message: string): void {
+        this._buffer.push(message);
     }
 }
 
