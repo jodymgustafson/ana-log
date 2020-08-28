@@ -11,6 +11,13 @@ describe("Test Defaults:", () =>{
         it("should get logger by name", () => expect(anaLog.getLogger("test").name).toBe("test"));
     });
 
+    describe("When get logger before default created", () => {
+        beforeAll(() => {
+            anaLog.reset();
+        });
+        it("default logger level should be ALL", () => expect(anaLog.getLogger("test").level).toBe(anaLog.LogLevel.All));
+    });
+
     describe("When set default logger to Warn", () => {
         beforeAll(() => {
             anaLog.reset();

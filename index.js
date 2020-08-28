@@ -86,12 +86,12 @@ class MemoryAppender extends BaseAppender {
 exports.MemoryAppender = MemoryAppender;
 class Logger {
     /**
-     * Creates a new Logger instance
-     * @param _name Name of the logger
-     * @param _level Optional level, if not defined will use default logger's level
+     * Creates a new Logger instance. Don't create one directly, use getLogger() instead.
+     * @param name Name of the logger
+     * @param level Optional level, if not defined will use default logger's level
      * @param appender Optional list of appenders, if not defined will use default logger's appenders
      */
-    constructor(name, level = LogLevel.Debug, ...appender) {
+    constructor(name, level = getLogger().level, ...appender) {
         this._name = name;
         this._level = level;
         this._appenders = appender;

@@ -137,12 +137,12 @@ export class Logger
     private _appenders: IAppender[];
 
     /**
-     * Creates a new Logger instance
-     * @param _name Name of the logger
-     * @param _level Optional level, if not defined will use default logger's level
+     * Creates a new Logger instance. Don't create one directly, use getLogger() instead.
+     * @param name Name of the logger
+     * @param level Optional level, if not defined will use default logger's level
      * @param appender Optional list of appenders, if not defined will use default logger's appenders
      */
-    constructor(name: string, level = LogLevel.Debug, ...appender: IAppender[]) {
+    constructor(name: string, level = getLogger().level, ...appender: IAppender[]) {
         this._name = name;
         this._level = level;
         this._appenders = appender;

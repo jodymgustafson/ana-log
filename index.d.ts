@@ -38,9 +38,9 @@ export declare class DefaultFormatter implements IFormatter {
  */
 export declare abstract class BaseAppender implements IAppender {
     private _formatter;
-    readonly formatter: IFormatter;
+    get formatter(): IFormatter;
     private _level;
-    readonly level: LogLevel;
+    get level(): LogLevel;
     constructor();
     constructor(formatter: IFormatter);
     constructor(logLevel: LogLevel);
@@ -60,7 +60,7 @@ export declare class ConsoleAppender extends BaseAppender {
  */
 export declare class MemoryAppender extends BaseAppender {
     private _buffer;
-    readonly buffer: string[];
+    get buffer(): string[];
     /** Clears the buffer */
     reset(): void;
     protected writeMessage(message: string): void;
@@ -70,22 +70,22 @@ export declare class Logger {
     private _level;
     private _appenders;
     /**
-     * Creates a new Logger instance
-     * @param _name Name of the logger
-     * @param _level Optional level, if not defined will use default logger's level
+     * Creates a new Logger instance. Don't create one directly, use getLogger() instead.
+     * @param name Name of the logger
+     * @param level Optional level, if not defined will use default logger's level
      * @param appender Optional list of appenders, if not defined will use default logger's appenders
      */
     constructor(name: string, level?: LogLevel, ...appender: IAppender[]);
     addAppender(...appender: IAppender[]): void;
-    readonly name: string;
-    readonly level: LogLevel;
-    readonly appenders: IAppender[];
-    readonly isDebugEnabled: boolean;
-    readonly isInfoEnabled: boolean;
-    readonly isWarnEnabled: boolean;
-    readonly isErrorEnabled: boolean;
-    readonly isFatalEnabled: boolean;
-    readonly isAllEnabled: boolean;
+    get name(): string;
+    get level(): LogLevel;
+    get appenders(): IAppender[];
+    get isDebugEnabled(): boolean;
+    get isInfoEnabled(): boolean;
+    get isWarnEnabled(): boolean;
+    get isErrorEnabled(): boolean;
+    get isFatalEnabled(): boolean;
+    get isAllEnabled(): boolean;
     debug(...data: any[]): void;
     info(...data: any[]): void;
     warn(...data: any[]): void;
