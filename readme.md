@@ -56,7 +56,7 @@ There are three ways to log at any level.
 #### Passing in an object
     logger.error(myObject);
 
-*Note: The object will be formatted to a json string*
+*Note: The object will be formatted to a json string using JSON.stringify*
 
 #### Using a function
     logger.info(() => "Hello " + name);
