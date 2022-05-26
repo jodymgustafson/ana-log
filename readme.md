@@ -5,7 +5,7 @@ AnaLog is a new kind of logging library for JavaScript.
 It's designed to be easy to use with minimal configuration, yet allow more complicated setup when necessary.
 
 - No configuration necessary for simple logging to console
-- Supports standard logging levels from debug to fatal
+- Supports standard logging levels from trace to fatal
 - Not necessary to check log level before logging
 - Can easily write your own appenders to write messages anywhere you want
 - Pass in multiple messages like console.log()
@@ -23,7 +23,7 @@ Requires ES6
 
 ## Quick Start
 Install using npm
-- npm install --save analogging
+- npm install analogging
 
 For simple logging you can get started without doing any configuration.
 Simply call the `getLogger()` function to get a root logger and set its level.
@@ -36,8 +36,9 @@ If you want a logger with a different name and level just ask for it.
 
     const fooLogger = anaLog.getLogger("foo", anaLog.LogLevel.Info);
 
-You can log at any one of the 5 levels (debug, info, warn, error, fatal).
+You can log at any one of the 6 levels (trace, debug, info, warn, error, fatal).
 You can check if logging is enabled for any level or above using one of the following
+- `logger.isTraceEnabled`
 - `logger.isDebugEnabled`
 - `logger.isInfoEnabled`
 - `logger.isWarnEnabled`
@@ -75,11 +76,12 @@ This approach also has the benefit of automatically checking the logging level.
 Log levels are defined by the enumeration `LogLevel`.
 
 - `LogLevel.All`: Logs all messages
-- `LogLevel.Debug`: Logs all messages at debug level and above
-- `LogLevel.Info`: Logs all messages at info level and above (debug will not be logged)
-- `LogLevel.Warn`: Logs all messages at warn level and above (debug and info will not be logged)
-- `LogLevel.Error`: Logs all messages at error level and above (debug, info and warn will not be logged)
-- `LogLevel.Fatal`: Logs all messages at fatal level and above (debug, info, warn and error will not be logged)
+- `LogLevel.Trace`: Logs all messages at trace level and above
+- `LogLevel.Debug`: Logs all messages at debug level and above (trace will not be logged)
+- `LogLevel.Info`: Logs all messages at info level and above (trace and debug will not be logged)
+- `LogLevel.Warn`: Logs all messages at warn level and above (trace, debug and info will not be logged)
+- `LogLevel.Error`: Logs all messages at error level and above (trace, debug, info and warn will not be logged)
+- `LogLevel.Fatal`: Logs all messages at fatal level and above (trace, debug, info, warn and error will not be logged)
 - `LogLevel.None`: No messages will be logged
 
 ## Loggers

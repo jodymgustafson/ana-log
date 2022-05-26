@@ -1,6 +1,6 @@
-export enum LogLevel
-{
+export enum LogLevel {
     All,
+    Trace,
     Debug,
     Info,
     Warn,
@@ -9,31 +9,26 @@ export enum LogLevel
     None
 }
 
-export interface IAppender
-{
+export interface IAppender {
     write(logger: Logger, level: LogLevel, ...data: any[]): void;
 }
 
-export interface IFormatter
-{
+export interface IFormatter {
     format(logger: Logger, level: LogLevel, ...data: any[]): string;
 }
 
-export interface IAppenderConfig
-{
+export interface IAppenderConfig {
     name: string;
     appender: IAppender;
 }
 
-export interface ILoggerConfig
-{
+export interface ILoggerConfig {
     name: string;
     level: LogLevel;
-    appenders?: (string|IAppender)[];
+    appenders?: (string | IAppender)[];
 }
 
-export interface IAnaLogConfiguration
-{
+export interface IAnaLogConfiguration {
     appenders?: IAppenderConfig[];
     loggers: ILoggerConfig[];
 }
@@ -41,16 +36,14 @@ export interface IAnaLogConfiguration
 /**
  * Default IFormatter implementation. Writes a timestamp, the log level and user defined messages
  */
-export class DefaultFormatter implements IFormatter
-{
+export class DefaultFormatter implements IFormatter {
     format(logger: Logger, level: LogLevel, ...data: any[]): string {
         const ts = new Date();
         const name = logger.name ? ` [${logger.name}]` : "";
         return `[${ts.toISOString()}] [${LogLevel[level]}]${name}${this.getMessage(...data)}`;
     }
 
-    protected getMessage(...data: any[]): string
-    {
+    protected getMessage(...data: any[]): string {
         return data.reduce((prev: string, cur: any) => {
             return prev + " " + (
                 (typeof cur === "string") ? cur : JSON.stringify(cur));
@@ -63,8 +56,7 @@ const DEFAULT_FORMATTER = new DefaultFormatter();
 /**
  * Abstract base class for implementing IAppender
  */
-export abstract class BaseAppender implements IAppender
-{
+export abstract class BaseAppender implements IAppender {
     private _formatter: IFormatter;
     public get formatter() {
         return this._formatter;
@@ -80,7 +72,7 @@ export abstract class BaseAppender implements IAppender
     constructor(logLevel: LogLevel);
     constructor(logLevel: LogLevel, formatter: IFormatter);
     constructor(logLevel?: LogLevel, formatter?: IFormatter);
-    constructor(param1?: IFormatter|LogLevel, param2?: IFormatter) {
+    constructor(param1?: IFormatter | LogLevel, param2?: IFormatter) {
         if (typeof param1 === "undefined") {
             this._formatter = DEFAULT_FORMATTER;
         }
@@ -105,8 +97,7 @@ export abstract class BaseAppender implements IAppender
 /**
  * An appender that writes log messages to the console
  */
-export class ConsoleAppender extends BaseAppender
-{
+export class ConsoleAppender extends BaseAppender {
     protected writeMessage(message: string): void {
         console.log(message);
     }
@@ -115,10 +106,9 @@ export class ConsoleAppender extends BaseAppender
 /**
  * An appender that writes log messages to an array
  */
-export class MemoryAppender extends BaseAppender
-{
+export class MemoryAppender extends BaseAppender {
     private _buffer: string[] = [];
-    get buffer(): string[] {return this._buffer;}
+    get buffer(): string[] { return this._buffer; }
 
     /** Clears the buffer */
     reset(): void {
@@ -130,8 +120,7 @@ export class MemoryAppender extends BaseAppender
     }
 }
 
-export class Logger
-{
+export class Logger {
     private _name: string;
     private _level: LogLevel;
     private _appenders: IAppender[];
@@ -158,52 +147,82 @@ export class Logger
     get name(): string {
         return this._name;
     }
-    get level(): LogLevel { 
+    get level(): LogLevel {
         return this._level;
     }
     get appenders(): IAppender[] {
         // return a copy
         return this._appenders;//.slice();
     }
+    /** Checks whether the logger is enabled for the trace level */
+    get isTraceEnabled(): boolean {
+        return (this.level <= LogLevel.Trace);
+    }
+    /** Checks whether the logger is enabled for the debug level */
     get isDebugEnabled(): boolean {
         return (this.level <= LogLevel.Debug);
     }
+    /** Checks whether the logger is enabled for the info level */
     get isInfoEnabled(): boolean {
         return (this.level <= LogLevel.Info);
     }
+    /** Checks whether the logger is enabled for the warn level */
     get isWarnEnabled(): boolean {
         return (this.level <= LogLevel.Warn);
     }
+    /** Checks whether the logger is enabled for the error level */
     get isErrorEnabled(): boolean {
         return (this.level <= LogLevel.Error);
     }
+    /** Checks whether the logger is enabled for the fatal level */
     get isFatalEnabled(): boolean {
         return (this.level <= LogLevel.Fatal);
     }
+    /** Checks whether the logger is enabled for all levels */
     get isAllEnabled(): boolean {
         return (this.level <= LogLevel.All);
     }
+    /** Checks whether the logger is turned off (level set to None) */
+    get isOff(): boolean {
+        return (this.level >= LogLevel.None);
+    }
 
+    /** Checks whether the logger is enabled for the specified level */
+    isEnabled(level: LogLevel): boolean {
+        return this.level <= level;
+    }
+
+    /** Logs a message at the trace level */
+    trace(...data: any[]): void {
+        this.log(LogLevel.Trace, ...data);
+    }
+
+    /** Logs a message at the debug level */
     debug(...data: any[]): void {
         this.log(LogLevel.Debug, ...data);
     }
 
+    /** Logs a message at the info level */
     info(...data: any[]): void {
         this.log(LogLevel.Info, ...data);
     }
 
+    /** Logs a message at the warn level */
     warn(...data: any[]): void {
         this.log(LogLevel.Warn, ...data);
     }
 
+    /** Logs a message at the error level */
     error(...data: any[]): void {
         this.log(LogLevel.Error, ...data);
     }
 
+    /** Logs a message at the fatal level */
     fatal(...data: any[]): void {
         this.log(LogLevel.Fatal, ...data);
     }
 
+    /** Logs a message at the specified level */
     log(level: LogLevel, ...data: any[]): void {
         if (this.level <= level) {
             this.writeToAppenders(level, ...data);
@@ -213,7 +232,7 @@ export class Logger
     protected writeToAppenders(level: LogLevel, ...data: any[]): void {
         this._appenders.forEach(a => a.write(this, level, ...this.processData(...data)));
     }
-    
+
     private processData(...data: any[]): any[] {
         return data.map(value => (typeof value === "function") ? value() : value);
     }
@@ -253,7 +272,7 @@ export function getLogger(name: string): Logger;
  * @param level 
  */
 export function getLogger(name: string, level: LogLevel): Logger;
-export function getLogger(param1?: string|LogLevel, level?: LogLevel): Logger {
+export function getLogger(param1?: string | LogLevel, level?: LogLevel): Logger {
     const param1IsName = typeof param1 === "string";
     const name = param1IsName ? param1 as string : "";
     let logger = globalLoggers.get(name);
@@ -263,7 +282,7 @@ export function getLogger(param1?: string|LogLevel, level?: LogLevel): Logger {
             // Add the default logger if not exists
             addLogger("", LogLevel.All);
         }
-        
+
         if (!param1IsName && typeof param1 === "number") {
             level = param1 as LogLevel;
         }

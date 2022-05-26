@@ -1,11 +1,12 @@
 export declare enum LogLevel {
     All = 0,
-    Debug = 1,
-    Info = 2,
-    Warn = 3,
-    Error = 4,
-    Fatal = 5,
-    None = 6
+    Trace = 1,
+    Debug = 2,
+    Info = 3,
+    Warn = 4,
+    Error = 5,
+    Fatal = 6,
+    None = 7
 }
 export interface IAppender {
     write(logger: Logger, level: LogLevel, ...data: any[]): void;
@@ -80,17 +81,37 @@ export declare class Logger {
     get name(): string;
     get level(): LogLevel;
     get appenders(): IAppender[];
+    /** Checks whether the logger is enabled for the trace level */
+    get isTraceEnabled(): boolean;
+    /** Checks whether the logger is enabled for the debug level */
     get isDebugEnabled(): boolean;
+    /** Checks whether the logger is enabled for the info level */
     get isInfoEnabled(): boolean;
+    /** Checks whether the logger is enabled for the warn level */
     get isWarnEnabled(): boolean;
+    /** Checks whether the logger is enabled for the error level */
     get isErrorEnabled(): boolean;
+    /** Checks whether the logger is enabled for the fatal level */
     get isFatalEnabled(): boolean;
+    /** Checks whether the logger is enabled for all levels */
     get isAllEnabled(): boolean;
+    /** Checks whether the logger is turned off (level set to None) */
+    get isOff(): boolean;
+    /** Checks whether the logger is enabled for the specified level */
+    isEnabled(level: LogLevel): boolean;
+    /** Logs a message at the trace level */
+    trace(...data: any[]): void;
+    /** Logs a message at the debug level */
     debug(...data: any[]): void;
+    /** Logs a message at the info level */
     info(...data: any[]): void;
+    /** Logs a message at the warn level */
     warn(...data: any[]): void;
+    /** Logs a message at the error level */
     error(...data: any[]): void;
+    /** Logs a message at the fatal level */
     fatal(...data: any[]): void;
+    /** Logs a message at the specified level */
     log(level: LogLevel, ...data: any[]): void;
     protected writeToAppenders(level: LogLevel, ...data: any[]): void;
     private processData;

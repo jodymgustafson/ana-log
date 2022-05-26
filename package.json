@@ -1,6 +1,6 @@
 {
   "name": "analogging",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "Delightful logging for JavaScript",
   "main": "index.js",
   "scripts": {

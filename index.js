@@ -1,14 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.reset = exports.addAppender = exports.getAppender = exports.configure = exports.getLogger = exports.Logger = exports.MemoryAppender = exports.ConsoleAppender = exports.BaseAppender = exports.DefaultFormatter = exports.LogLevel = void 0;
 var LogLevel;
 (function (LogLevel) {
     LogLevel[LogLevel["All"] = 0] = "All";
-    LogLevel[LogLevel["Debug"] = 1] = "Debug";
-    LogLevel[LogLevel["Info"] = 2] = "Info";
-    LogLevel[LogLevel["Warn"] = 3] = "Warn";
-    LogLevel[LogLevel["Error"] = 4] = "Error";
-    LogLevel[LogLevel["Fatal"] = 5] = "Fatal";
-    LogLevel[LogLevel["None"] = 6] = "None";
+    LogLevel[LogLevel["Trace"] = 1] = "Trace";
+    LogLevel[LogLevel["Debug"] = 2] = "Debug";
+    LogLevel[LogLevel["Info"] = 3] = "Info";
+    LogLevel[LogLevel["Warn"] = 4] = "Warn";
+    LogLevel[LogLevel["Error"] = 5] = "Error";
+    LogLevel[LogLevel["Fatal"] = 6] = "Fatal";
+    LogLevel[LogLevel["None"] = 7] = "None";
 })(LogLevel = exports.LogLevel || (exports.LogLevel = {}));
 /**
  * Default IFormatter implementation. Writes a timestamp, the log level and user defined messages
@@ -112,39 +114,67 @@ class Logger {
         // return a copy
         return this._appenders; //.slice();
     }
+    /** Checks whether the logger is enabled for the trace level */
+    get isTraceEnabled() {
+        return (this.level <= LogLevel.Trace);
+    }
+    /** Checks whether the logger is enabled for the debug level */
     get isDebugEnabled() {
         return (this.level <= LogLevel.Debug);
     }
+    /** Checks whether the logger is enabled for the info level */
     get isInfoEnabled() {
         return (this.level <= LogLevel.Info);
     }
+    /** Checks whether the logger is enabled for the warn level */
     get isWarnEnabled() {
         return (this.level <= LogLevel.Warn);
     }
+    /** Checks whether the logger is enabled for the error level */
     get isErrorEnabled() {
         return (this.level <= LogLevel.Error);
     }
+    /** Checks whether the logger is enabled for the fatal level */
     get isFatalEnabled() {
         return (this.level <= LogLevel.Fatal);
     }
+    /** Checks whether the logger is enabled for all levels */
     get isAllEnabled() {
         return (this.level <= LogLevel.All);
     }
+    /** Checks whether the logger is turned off (level set to None) */
+    get isOff() {
+        return (this.level >= LogLevel.None);
+    }
+    /** Checks whether the logger is enabled for the specified level */
+    isEnabled(level) {
+        return this.level <= level;
+    }
+    /** Logs a message at the trace level */
+    trace(...data) {
+        this.log(LogLevel.Trace, ...data);
+    }
+    /** Logs a message at the debug level */
     debug(...data) {
         this.log(LogLevel.Debug, ...data);
     }
+    /** Logs a message at the info level */
     info(...data) {
         this.log(LogLevel.Info, ...data);
     }
+    /** Logs a message at the warn level */
     warn(...data) {
         this.log(LogLevel.Warn, ...data);
     }
+    /** Logs a message at the error level */
     error(...data) {
         this.log(LogLevel.Error, ...data);
     }
+    /** Logs a message at the fatal level */
     fatal(...data) {
         this.log(LogLevel.Fatal, ...data);
     }
+    /** Logs a message at the specified level */
     log(level, ...data) {
         if (this.level <= level) {
             this.writeToAppenders(level, ...data);
